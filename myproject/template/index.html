@@ -314,7 +314,7 @@
 				<div class="row testimonials_row">
 					<div class="col">
 						<canvas id="canvas" width="500" height="500"></canvas>{{canvasdata}}
-						
+						<button id="clear"></button>
 					</div>
 				</div>
 			</div>
@@ -603,9 +603,11 @@
 								canvas.addEventListener('mousemove', putPoint);
 								canvas.addEventListener('mouseup', disengage);
 					
-								const clear = document.querySelector('#clear');
+								const clear = document.getElementById('clear');
+								clear.style.height = '200px';
+								clear.style.width= '200px';
 								clear.addEventListener('click', ()=>{
-									const canvas = document.querySelector('#canvas');
+									const canvas = document.getElementById('canvas');
 									const context = canvas.getContext('2d');
 									context.filter = 'invert(0)';
 									context.fillStyle = "black";
