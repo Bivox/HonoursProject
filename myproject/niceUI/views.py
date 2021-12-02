@@ -97,7 +97,7 @@ def digit_rec_model(request):
 app = Flask(__name__)
 
 # Load prebuilt model
-model = keras.models.load_model('app/digit_rec.h5')
+model = tf.keras.models.load_model('app/digit_rec.h5')
 
 # Handle GET request
 @app.route('/', methods=['GET'])
