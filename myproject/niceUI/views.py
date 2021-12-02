@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from tensorflow import keras
 
 from myapp.models import Destination
 
@@ -27,12 +28,12 @@ def index(request):
 app = Flask(__name__)
 
 # Load prebuilt model
-model = keras.models.load_model('app/mnist_classification.h5')
+#model = keras.models.load_model('app/mnist_classification.h5')
 
 # Handle GET request
 @app.route('/', methods=['GET'])
 def drawing():
-    return render_template('drawing.html')
+    return render_template('index.html')
 
 # Handle POST request
 @app.route('/', methods=['POST'])
@@ -57,9 +58,10 @@ def canvas():
     try:
         prediction = np.argmax(model.predict(img))
         print(f"Prediction Result : {str(prediction)}")
-        return render_template('drawing.html', response=str(prediction), canvasdata=canvasdata, success=True)
+        return render_template('index.html', response=str(prediction), canvasdata=canvasdata, success=True)
     except Exception as e:
-        return render_template('drawing.html', response=str(e), canvasdata=canvasdata)
+
+        return render_template('index.html', response=str(e), canvasdata=canvasdata)
 
 def digit_rec_model(request):
    #hand written characters 28x28 sized images of 0...9

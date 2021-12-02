@@ -308,11 +308,12 @@
 						<div class="section_title">
 							<h2>TRAINING OUR MACHINE</h2>
 						</div>
+						
 					</div>
 				</div>
 				<div class="row testimonials_row">
 					<div class="col">
-
+						<canvas id="canvas" width="500" height="500"></canvas>{{canvasdata}}
 						
 					</div>
 				</div>
@@ -551,10 +552,10 @@
 						<script>
 							// Canvas Drawing
 							window.addEventListener('load', ()=>{
-								const canvas = document.querySelector('#canvas');
+								const canvas = document.getElementById('canvas');
 								const context = canvas.getContext('2d');
 					
-								const canvasdata = document.querySelector('#canvasdata').value;
+								const canvasdata = document.getElementById('canvas').value;
 								if (canvasdata){
 									const image = new Image();
 									image.onload = ()=>{
