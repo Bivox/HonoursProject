@@ -82,7 +82,9 @@ def digit_rec_model(request):
    # preditions are an array of class probabilities, so we need to decode them
    predictions=model.predict([x_testr])
 
-
+   # Save model
+   model.save('mnist_classification.h5')
+   
    # Evaluating the predictions
    # Comparing test data vs predicted data
 
