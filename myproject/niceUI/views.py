@@ -129,7 +129,7 @@ def digit_rec_model(request):
     predictions=model.predict([x_testr])
 
     # Save model
-    model.save('digit_rec.h5')
+    model.save('niceUI/digit_rec.h5')
 
     # Evaluating the predictions
     # Comparing test data vs predicted data
