@@ -1,4 +1,5 @@
 {% load static %}
+
 {% static "images" as baseUrl %}
 <!DOCTYPE html>
 <html lang="en">
@@ -270,7 +271,11 @@
 				<div class="row destinations_row">
 					<div class="col">
 						<div class="destinations_container item_grid">
-
+							<a target="_blank" 
+								class="btn btn-info pull-right" 
+								href="https://stackoverflow.com/questions/15341285/how-do-i-call-a-django-function-on-button-click">
+								Check It Out
+							</a>
 							{% for dest in dests %}
 							<!-- Destination -->
 							<div class="destination item">
@@ -313,8 +318,11 @@
 				</div>
 				<div class="row testimonials_row">
 					<div class="col">
-						<canvas id="canvas" width="500" height="500"></canvas>{{canvasdata}}
+						<canvas id="canvas" width="500" height="500"></canvas>
 						<button id="clear"></button>
+						<div>
+							<p>My Model: {{model}}</p>
+						</div>
 					</div>
 				</div>
 			</div>
