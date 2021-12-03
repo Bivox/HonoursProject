@@ -143,15 +143,17 @@ def digit_rec_model(request):
 
     return render(request, "index.html", {'model':model.get_weights})
 
-def predict_digit(img):
+def predict_digit(canvas_img):
    # Load prebuilt model
    reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
 
-   img = cv2.imread(img)
+   img = cv2.imread(canvas_img)
    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
    resized=cv2.resize(gray, (28,28), interpolation=cv2.INTER_AREA)
-   norm_img=tf.keras.utils.normalize(resized,axis=1) # 0 to 1 scaling
-   norm_img=np.array(norm_img).reshape(-1, img, img,1) #kernel operation of convolution layer
+   # 0 to 1 scaling
+   norm_img=tf.keras.utils.normalize(resized,axis=1) 
+   #kernel operation of convolution layer
+   norm_img=np.array(norm_img).reshape(-1, img, img,1) 
    predictions=reconstructed_model.predict(norm_img)
    print(np.argmax(predictions))
 
