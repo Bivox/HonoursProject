@@ -147,7 +147,7 @@ def predict_digit(img):
    # Load prebuilt model
    reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
 
-   img = cv2.imread('m8.png')
+   img = cv2.imread(img)
    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
    resized=cv2.resize(gray, (28,28), interpolation=cv2.INTER_AREA)
    norm_img=tf.keras.utils.normalize(resized,axis=1) # 0 to 1 scaling
