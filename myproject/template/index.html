@@ -195,6 +195,18 @@
 										<div class="home_slider_content">
 											<div class="home_title">
 												<h2>NEURAL NET PROJECT</h2>
+												{% block content %}
+												<h1>Welcome {{name}}</h1>
+												<p>My first paragraph.</p>
+
+												<form action="add" method='post'>
+
+													{% csrf_token %}
+													Enter 1st number : <input type="text" name="num1"><br>
+													Enter 2nd number : <input type="text" name="num2"><br>
+													<input type="submit">
+												</form>
+												{% endblock %}
 											</div>
 										</div>
 									</div>
@@ -266,16 +278,19 @@
 						<div class="section_title">
 							<h2>CLEANING OUR DATA</h2>
 						</div>
+						{% block contents %}
+						<form action="add" method='post'>
+							{% csrf_token %}
+							MY BUTTON: <input type="submit">
+						</form>
+						{% endblock %}
 					</div>
 				</div>
 				<div class="row destinations_row">
 					<div class="col">
 						<div class="destinations_container item_grid">
-							<a target="_blank" 
-								class="btn btn-info pull-right" 
-								href="https://stackoverflow.com/questions/15341285/how-do-i-call-a-django-function-on-button-click">
-								Check It Out
-							</a>
+							
+
 							{% for dest in dests %}
 							<!-- Destination -->
 							<div class="destination item">
@@ -610,7 +625,11 @@
 								canvas.addEventListener('mousedown', engage);
 								canvas.addEventListener('mousemove', putPoint);
 								canvas.addEventListener('mouseup', disengage);
-					
+
+								const butn = document.getElementById('butn');
+								butn.style.height = '200px';
+								butn.style.width= '200px';
+
 								const clear = document.getElementById('clear');
 								clear.style.height = '200px';
 								clear.style.width= '200px';
