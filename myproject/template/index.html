@@ -78,7 +78,18 @@
 			}
 			context.stroke();
 		}
+		function addCode() {
+			canvas = document.getElementById('canvas'),
+			dataUrl = canvas.toDataURL(),
+			imageFoo = document.createElement('img');
+			imageFoo.src = dataUrl;
 		
+			// Style your image here
+			imageFoo.style.width = '100px';
+			imageFoo.style.height = '100px';
+			var src = document.getElementById("new_image");
+			src.appendChild(imageFoo);
+		}
 		</script>
 <head>
 	<title>Travello</title>
@@ -195,18 +206,7 @@
 										<div class="home_slider_content">
 											<div class="home_title">
 												<h2>NEURAL NET PROJECT</h2>
-												{% block content %}
-												<h1>Welcome {{name}}</h1>
-												<p>My first paragraph.</p>
-
-												<form action="add" method='post'>
-
-													{% csrf_token %}
-													Enter 1st number : <input type="text" name="num1"><br>
-													Enter 2nd number : <input type="text" name="num2"><br>
-													<input type="submit">
-												</form>
-												{% endblock %}
+												
 											</div>
 										</div>
 									</div>
@@ -281,7 +281,7 @@
 						{% block contents %}
 						<form action="add" method='post'>
 							{% csrf_token %}
-							MY BUTTON: <input type="submit">
+							Current function for this button is "add": <input type="submit">
 						</form>
 						{% endblock %}
 					</div>
@@ -334,10 +334,14 @@
 				<div class="row testimonials_row">
 					<div class="col">
 						<canvas id="canvas" width="500" height="500"></canvas>
-						<button id="clear"></button>
+						<button id="butn"></button>
+						
 						<div>
 							<p>My Model: {{model}}</p>
 						</div>
+					<div id="new_image">
+						<button onclick="addCode()">Add Stuff</button>
+					</div>
 					</div>
 				</div>
 			</div>
@@ -626,20 +630,19 @@
 								canvas.addEventListener('mousemove', putPoint);
 								canvas.addEventListener('mouseup', disengage);
 
+								
+
 								const butn = document.getElementById('butn');
 								butn.style.height = '200px';
 								butn.style.width= '200px';
-
-								const clear = document.getElementById('clear');
-								clear.style.height = '200px';
-								clear.style.width= '200px';
-								clear.addEventListener('click', ()=>{
+								butn.addEventListener('click', ()=>{
 									const canvas = document.getElementById('canvas');
 									const context = canvas.getContext('2d');
 									context.filter = 'invert(0)';
 									context.fillStyle = "black";
 									context.fillRect(0, 0, canvas.width, canvas.height);
 								});
+
 					
 								// Pastel
 								const pastel = document.querySelector('#pastel');
