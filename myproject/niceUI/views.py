@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from tensorflow import keras
 
-from myapp.models import Destination
-
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,26 +12,26 @@ from flask import Flask, render_template, request, jsonify
 from PIL import Image
 from itertools import product
 import os
+from django.shortcuts import render
+from .models import ImageForm
 
 # Create your views here.
-def index(request):
 
-   dest1 = Destination()
-   dest1.price = 400
 
-   dest2 = Destination()
-   dest2.price = 620
 
-   dests = [dest1, dest2]
-   return render(request, "index.html", {'dests': dests})
-
-def add(request):
-
-   val1 = int(request.POST['num1'])
-   val2 = int(request.POST['num2'])
-   res = val1 + val2
-
-   return render(request, 'index.html', {'result':res})
+def image_upload_view(request):
+    """Process images uploaded by users"""
+    print("made it in upload somehow")
+    form = ImageForm(request.POST, request.FILES)
+    print(request.POST)
+    if form.is_valid():
+        form.save()
+        # Get the current instance object to display in the template
+        img_obj = form.instance
+        return render(request, 'index.html', {'form': form, 'img_obj': img_obj})
+    else:
+        form = ImageForm()
+    return render(request, 'index.html', {'form': form})
 
 ## Initialize flask app
 app = Flask(__name__)
