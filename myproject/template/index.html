@@ -154,12 +154,28 @@
 			/*****************************
 			*** GET INDIVIDUAL DIGITS  *** 
 			*****************************/  
-			canvas = document.getElementById('canvas'),
-			context = canvas.getContext("2d");
+			//canvas = document.getElementById('canvas'),
+			//
 
+			canvas = document.getElementById('canvas');
+			imageWidth = canvas.width
+			imageHeight = canvas.height
+			dataUrl = canvas.toDataURL();
+			imageFoo = document.createElement('img');
+			imageFoo.src = dataUrl;
+		
+			// Style your image here
+			imageFoo.style.width = '400px';
+			imageFoo.style.height = '400px';
+			var src = document.getElementById("new_image");
+			src.appendChild(imageFoo);
+			context = canvas.getContext("2d");
+			
 			// Get ImageData to transform the image to array of pixels
+			//var imageDataOriginal = context.getImageData(0, 0, canvas.width, canvas.height);
 			var imageDataOriginal = context.getImageData(0, 0, canvas.width, canvas.height);
-			console.log(canvas.height)
+			console.log(imageDataOriginal)
+			//console.log(imageFoo.)
 			// The Image contains 160,000 (400 X 400) pixels.
 			// The ImageDataOriginal contains 160,000 * 4 rows.
 			// Each 4 rows is one pixel, row 0 is pixel 1 R channel (Red)
@@ -168,13 +184,31 @@
 			//                           row 3 is pixel 1 A channel (Alpha, transparency)        
 
 			// Iterate through the array and get only the Aplha channel, which is 255 for black and 0 for white
-			var imageArrayOriginal = [];
-			for (var i = 0; i<160000; i++){
-				imageArrayOriginal[i] = imageDataOriginal.data[(i*4)+3];            
+			var data = imageDataOriginal.data
+			for(var i = 0, n = imageDataOriginal.data.length; i < n; i += 4) {
+				var red = imageDataOriginal.data[i];
+				var green = imageDataOriginal.data[i + 1];
+				var blue = imageDataOriginal.data[i + 2];
+				var alpha = imageDataOriginal.data[i + 3];
+				if(alpha == 0){
+					console.log(imageDataOriginal.data[i + 3]);
+				}
 			}
-			console.log("Step 1 cleared ")
-			// Separate different numbers by grouping adjacent pixels 
-			          
+			  // pick out pixel data from x, y coordinate
+			var x = 0;
+			var y = 0;
+			var red = data[((imageWidth * y) + x) * 4];
+			var green = data[((imageWidth * y) + x) * 4 + 1];
+			var blue = data[((imageWidth * y) + x) * 4 + 2];
+			var alpha = data[((imageWidth * y) + x) * 4 + 3];
+			console.log(red)
+			  // iterate over all p
+			var imageArrayOriginal = [];
+			for (var i = 3; i<160000; i+=4){
+				imageArrayOriginal[i] = imageDataOriginal.data[(i)];            
+			}
+			
+			// Separate different numbers by grouping adjacent pixels         
 			var k = 1;  
 			window['arrayN' + k] = [];
 			for (var row = 0; row<400; row++){            
@@ -184,13 +218,14 @@
 						// Get the adjacent pixels if stroke is continuous and assign it to an array
 						var nextColumn = 1;
 						window['arrayN' + k].push(row*400 + column);
-
-						/**while ( imageDataOriginal.data[(row*400 + column + nextColumn)*4+3] != 0){
+						
+						/**
+						while ( imageFoo.data[(row*400 + column + nextColumn)*4+3] != 0){
 							window['arrayN' + k].push(row*400 + column + nextColumn);
 							nextColumn++;
 							//console.log("step 2 cleared")
-						} **/ 
-						                       
+						} **/
+			               
 					   /**
 						// Check if this array is adjacent to another array in a previous row 
 						// k is the number or continuous arrays that have been identified
@@ -319,7 +354,7 @@
 			</div>
 			<div class="menu_content">
 				<ul>
-					<li><a href="inex.html">Home</a></li>
+					<li><a href="index.html">Home</a></li>
 					<li><a href="about.html">About us</a></li>
 				</ul>
 			</div>
@@ -446,15 +481,25 @@
 				</div>
 				<div class="row testimonials_row">
 					<div class="col">
-						<canvas id="canvas" width="400" height="400"></canvas>
+						
 						<button id="butn"> Clear canvas</button>
 						<div id="new_image">
 							<button onclick="addCode()">Create Image</button>
+							{% block conten %}
+							<form action="canvas" method='post'>
+								{% csrf_token %}
+								<canvas id="canvas" width="400" height="400"></canvas>
+								<canvas id="canvasimg" width="400" height="400"></canvas>
+								Use this code for when adding functions to buttons. Current function for this button is "add": <input type="submit">
+							</form>
+							{% endblock %}
+							
 							<input type = "button" onclick = "predict()" value = "Predict">  
 						</div>
 						<div>
-							<p>My Model: {{model}}</p>
+							<p>My model: {{new_model}}</p>
 						</div>
+
 					
 					</div>
 				</div>
@@ -756,7 +801,19 @@
 									context.fillStyle = "black";
 									context.fillRect(0, 0, canvas.width, canvas.height);
 								});
-
+								// Canvas Submit
+								const predict_button = document.getElementById('predict_button');
+								predict_button.style.height = '200px';
+								predict_button.style.width= '200px';
+								predict_button.addEventListener('click', ()=>{
+									const canvas = document.getElementById('canvas');
+									dataUrl = canvas.toDataURL();
+									imageFoo = document.createElement('img');
+									imageFoo.src = dataUrl;
+									predict(imageFoo)
+									});
+									
+								
 					
 								// Pastel
 								const pastel = document.querySelector('#pastel');
@@ -775,13 +832,10 @@
 									context.filter = 'invert(1)';
 									radius = 30;
 								});
+
 							});
 					
-							// Canvas Submit
-							const canvastoimage = ()=>{
-								const canvas = document.querySelector('#canvas');
-								document.getElementById('canvasimg').value = canvas.toDataURL();
-							};
+							
 
 							
 						</script>
@@ -798,5 +852,6 @@
 						<script src="{% static 'plugins/parallax-js-master/parallax.min.js' %}"></script>
 						<script src="{% static 'js/custom.js' %}"></script>
 </body>
+
 
 </html>

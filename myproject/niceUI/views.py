@@ -11,6 +11,9 @@ from tensorflow.keras.layers import Dense,Dropout, Activation, Flatten, Conv2D, 
 import cv2
 import base64
 from flask import Flask, render_template, request, jsonify
+from PIL import Image
+from itertools import product
+import os
 
 # Create your views here.
 def index(request):
@@ -36,7 +39,9 @@ def add(request):
 app = Flask(__name__)
 
 # Load prebuilt model
-reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('app/digit_rec.h5')
+#reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('app/digit_rec.h5')
+reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
+
 
 # Handle GET request
 @app.route('/', methods=['GET'])
@@ -45,9 +50,9 @@ def drawing():
 
 # Handle POST request
 @app.route('/', methods=['POST'])
-def canvas():
+def canvas(request):
     # Recieve base64 data from the user form
-    canvasdata = request.form['canvasimg']
+    canvasdata = request.form["canvasimg"]
     encoded_data = request.form['canvasimg'].split(',')[1]
 
     # Decode base64 image to python array
@@ -71,6 +76,10 @@ def canvas():
 
         return render_template('index.html', response=str(e), canvasdata=canvasdata)
 
+def load_model(request):
+    # Load prebuilt model
+    reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
+    return render(request, 'index.html',{'new_model':reconstructed_model.get_weights})
 
 def digit_rec_model(request):
 
@@ -129,7 +138,7 @@ def digit_rec_model(request):
     model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",metrics=['accuracy'])
 
     # Training the model
-    model.fit(x_trainr, y_train, epochs=1,validation_split=0.3)
+    model.fit(x_trainr, y_train, epochs=5,validation_split=0.3)
 
     # Predictions
     # preditions are an array of class probabilities, so we need to decode them
@@ -143,9 +152,30 @@ def digit_rec_model(request):
 
     return render(request, "index.html", {'model':model.get_weights})
 
-def predict_digit(canvas_img):
+def crop(request, img):
+    
+    # Size of the image in pixels (size of original image)
+    # (This is not mandatory)
+    width, height = img.size
+    
+    # Setting the points for cropped image
+    left = 5
+    top = height / 4
+    right = 164
+    bottom = 3 * height / 4
+    
+    # Cropped image of above dimension
+    # (It will not change original image)
+    im1 = img.crop((left, top, right, bottom))
+    
+    # Shows the image in image viewer
+    im1.show()
+    return (request, "index.html", {'cropped_img':im1})
+
+
+def predict_digit(request, canvas_img, model):
    # Load prebuilt model
-   reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
+   #reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
 
    img = cv2.imread(canvas_img)
    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -154,7 +184,8 @@ def predict_digit(canvas_img):
    norm_img=tf.keras.utils.normalize(resized,axis=1) 
    #kernel operation of convolution layer
    norm_img=np.array(norm_img).reshape(-1, img, img,1) 
-   predictions=reconstructed_model.predict(norm_img)
+   predictions=model.predict(norm_img)
    print(np.argmax(predictions))
+   return (request, "index.html", {'prediction_number':np.argmax(predictions),'model':model.get_weights})
 
 
