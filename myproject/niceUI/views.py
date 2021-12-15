@@ -25,7 +25,7 @@ app = Flask(__name__)
 
 # Load prebuilt model
 #reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('app/digit_rec.h5')
-reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
+reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
 
 
 # Handle GET request
@@ -164,7 +164,7 @@ def predict_digit(request):
    IMG_SIZE=28
    img = cv2.imread('/Users/beril/Downloads/hand_written_digit.png')
    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-   resized=cv2.resize(gray, (img_size,img_size), interpolation=cv2.INTER_AREA)
+   resized=cv2.resize(gray, (IMG_SIZE,IMG_SIZE), interpolation=cv2.INTER_AREA)
    # 0 to 1 scaling
    norm_img=tf.keras.utils.normalize(resized,axis=1) 
    #kernel operation of convolution layer
