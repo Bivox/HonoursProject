@@ -137,22 +137,17 @@ def digit_rec_model():
 
     return model
 
-def crop(img):
+def crop(img, x = 0, y = 0, w = 800, h = 800):
 
     # Setting the points for cropped image
     #for first section
-    y=0
-    x=0
-    h,w,_ = img.shape
-    im1 = img[y:h, x:w//2]
+    im1 = img[y:h+y, x:w+x]
     
-    #cropping second half of image
-    y1=0
+    '''#cropping second half of image
     x1=w//2
+    im2 = img[y:h, x1:w]'''
     
-    im2 = img[y1:h, x1:w]
-    
-    return (im1, im2)
+    return im1
 
 
 def predict_digit(request):
@@ -160,29 +155,40 @@ def predict_digit(request):
     reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
     IMG_SIZE=28
     img = cv2.imread('/Users/Marco/Downloads/hand_written_digit.png')
-    img_left, img_right = crop(img)
+    #TODO img_left, img_right = crop(img)
     canny_output=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     #canny_output = cv2.Canny(img, 100, 100 * 2)
-    con, h = cv2.findContours(canny_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.imshow("canny", canny_output)
+    con = cv2.findContours(canny_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    con = con[0] if len(con) == 2 else con[1]
+    #creating a list of cropped imgs
+    lst = []
+    for c in con:
+        x, y, w, h = cv2.boundingRect(c)
+        print(x, y, w, h)
+        cropped = crop(canny_output, x, y, w, h)
+
+        print(con)
+        cv2.imshow("cropped", cropped)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        lst.append(cropped)
+    #cv2.imshow("canny", canny_output)
     print("length of con: "+str(len(con)))
     '''if cv2.countNonZero(img_right) == 0:
         print ("Image is black")
     else:
         print ("Colored image")'''
-    cv2.imshow("left", img_left)
-    cv2.imshow("right", img_right)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    resized=cv2.resize(gray, (IMG_SIZE,IMG_SIZE), interpolation=cv2.INTER_AREA)
+
+    '''for c in lst:
+        
+        resized=cv2.resize(c, (IMG_SIZE,IMG_SIZE), interpolation=cv2.INTER_AREA)
     
-    # 0 to 1 scaling
-    norm_img=tf.keras.utils.normalize(resized,axis=1) 
-    #kernel operation of convolution layer
-    norm_img=np.array(norm_img).reshape(-1, IMG_SIZE, IMG_SIZE,1) 
-    predictions=reconstructed_model.predict(norm_img)
-    print("predicted value: "+str(np.argmax(predictions)))
-    return render(request, "index.html", {'prediction_number':np.argmax(predictions),'model':reconstructed_model.get_weights})
+        # 0 to 1 scaling
+        norm_img=tf.keras.utils.normalize(resized,axis=1) 
+        #kernel operation of convolution layer
+        norm_img=np.array(norm_img).reshape(-1, IMG_SIZE, IMG_SIZE,1) 
+        predictions=reconstructed_model.predict(norm_img)
+        print("predicted value: "+str(np.argmax(predictions)))'''
+    return render(request, "index.html", {'prediction_number':69420,'model':reconstructed_model.get_weights})
 
 
