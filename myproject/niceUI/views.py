@@ -13,7 +13,7 @@ from PIL import Image
 from itertools import product
 import os
 from django.shortcuts import render
-from .models import ImageForm
+
 
 # Create your views here.
 

@@ -74,6 +74,10 @@
 			imageFoo.style.width = '400px';
 			imageFoo.style.height = '400px';
 			var src = document.getElementById("new_image");
+			var link = document.getElementById('link');
+			link.setAttribute('download', 'MintyPaper.png');
+			link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+			link.click();
 			src.appendChild(imageFoo);
 		}
 		//credit to: https://github.com/wosaku/handwritten-digits-recognition
@@ -411,28 +415,15 @@
 				<div class="row testimonials_row">
 					<div class="col">
 						
-						<button id="butn"> Clear canvas</button>
+						
 						<div id="new_image">
-							<button onclick="addCode()">Create Image</button>
-							
-							{% block conten %}
-							<form action="image_upload_view" method='post'>
-								{% csrf_token %}
-								<canvas id="canvas" width="400" height="400"></canvas>
-								<input type="submit">
-							</form>
-							{% endblock %}
-							  
-							  {% if img_obj %}
-								<h3>Succesfully uploaded : {{img_obj.title}}</h3>
-								<img src="{{ img_obj.image.url}}" alt="connect" style="max-height:300px">
-							  {% endif %}
-
-							
-							
-							<input type = "button" onclick = "predict()" value = "Predict">  
+							<a id="link"></a>
+							<canvas id="canvas" width="400" height="400"></canvas>
+							 
 						</div>
-						<div>
+					<button id="butn"> Clear canvas</button>
+					<button onclick="addCode()">Save Image</button>
+					<div>
 							<p>My model: {{new_model}}</p>
 						</div>
 
