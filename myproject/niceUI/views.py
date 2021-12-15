@@ -20,20 +20,6 @@ from django.shortcuts import render
 
 
 
-def image_upload_view(request):
-    """Process images uploaded by users"""
-    print("made it in upload somehow")
-    form = ImageForm(request.POST, request.FILES)
-    print(request.POST)
-    if form.is_valid():
-        form.save()
-        # Get the current instance object to display in the template
-        img_obj = form.instance
-        return render(request, 'index.html', {'form': form, 'img_obj': img_obj})
-    else:
-        form = ImageForm()
-    return render(request, 'index.html', {'form': form})
-
 ## Initialize flask app
 app = Flask(__name__)
 
@@ -175,14 +161,14 @@ def crop(request, img):
 def predict_digit(request):
    # Load prebuilt model
    #reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
-   
-   img = cv2.imread('C:/Users/Marco/Downloads/hand_written_digit.png')
+   IMG_SIZE=28
+   img = cv2.imread('/Users/beril/Downloads/hand_written_digit.png')
    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-   resized=cv2.resize(gray, (28,28), interpolation=cv2.INTER_AREA)
+   resized=cv2.resize(gray, (img_size,img_size), interpolation=cv2.INTER_AREA)
    # 0 to 1 scaling
    norm_img=tf.keras.utils.normalize(resized,axis=1) 
    #kernel operation of convolution layer
-   norm_img=np.array(norm_img).reshape(-1, img, img,1) 
+   norm_img=np.array(norm_img).reshape(-1, IMG_SIZE, IMG_SIZE,1) 
    predictions=reconstructed_model.predict(norm_img)
    print(np.argmax(predictions))
    return (request, "index.html", {'prediction_number':np.argmax(predictions),'model':reconstructed_model.get_weights})
