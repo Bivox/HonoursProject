@@ -123,7 +123,7 @@ def digit_rec_model():
     model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",metrics=['accuracy'])
 
     # Training the model
-    model.fit(x_trainr, y_train, epochs=5,validation_split=0.3)
+    model.fit(x_trainr, y_train, epochs=3,validation_split=0.3)
 
     # Predictions
     # preditions are an array of class probabilities, so we need to decode them
@@ -143,6 +143,7 @@ def crop(img, x = 0, y = 0, w = 800, h = 800):
     #for first section
 
     im1 = img[y:h+y, x:w+x]
+    print()
     #print("img shape:",im1.shape)
     '''#cropping second half of image
     x1=w//2
@@ -152,47 +153,47 @@ def crop(img, x = 0, y = 0, w = 800, h = 800):
 
 def predict_digit(request):
     # Load prebuilt model
-    reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
+    #reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
+    reconstructed_model = digit_rec_model()
     IMG_SIZE=28
-    img = cv2.imread('/Users/beril/Downloads/hand_written_digit.png')
+    img = cv2.imread('/Users/Marco/Downloads/hand_written_digit.png')
     print("img shape:",img.shape)
     #TODO img_left, img_right = crop(img)
-    canny_output=img
-    print("canny shape:",canny_output.shape)
-    #canny_output = cv2.Canny(img, 100, 100 * 2)
+    imgray_1 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #ret, thresh = cv2.threshold(imgray_1, 127, 255, 0)
+    thresh = cv2.Canny(imgray_1, 100, 100 * 2)
     #canny_output=cv2.blur(canny_output, (5,5))
-    con = cv2.findContours(canny_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    con = con[0] if len(con) == 2 else con[1]
+    contours = cv2.findContours(imgray_1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours = contours[0] if len(contours) == 2 else contours[1]
     #creating a list of cropped imgs
     lst = []
-    for c in con:
+    for c in contours:
         x, y, w, h = cv2.boundingRect(c)
-        if w<100 or h<100:
-            continue
-        print(x, y, w, h)
-        cropped = crop(canny_output, x, y, w, h)
-        cropped = cv2.cvtColor(cropped,cv2.COLOR_BGR2GRAY)
+        #print(x, y, w, h)
+        
+        cropped = crop(imgray_1, x, y, w, h)
         print("--------- cropped dtype",cropped.shape)
-        result_image = np.full((800,800,3),(0,0,0), dtype=np.uint8)
+        result_image = np.full((800,800,1),0, dtype=np.uint8)
         print("1----result_image shape:",result_image.shape)
         # copy img image into center of result image
+        cropped = np.expand_dims(cropped, axis=-1)
         result_image[400:400 + h, 400:400+w] = cropped
-        print("result_image shape:",result_image.shape)
 
-        print(con)
-        '''cv2.imshow("cropped", cropped)
+        cv2.imshow("dying inside", result_image)
         cv2.waitKey(0)
-        cv2.destroyAllWindows()'''
+        cv2.destroyAllWindows()
         lst.append(result_image)
     #cv2.imshow("canny", canny_output)
-    print("length of con: "+str(len(con)))
+    print("length of con: "+str(len(contours)))
     '''if cv2.countNonZero(img_right) == 0:
         print ("Image is black")
     else:
         print ("Colored image")'''
     result=""
     for c in lst:
-        
+        cv2.imshow("dying inside", c)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         resized=cv2.resize(c, (IMG_SIZE,IMG_SIZE), interpolation=cv2.INTER_AREA)
     
         # 0 to 1 scaling
@@ -202,6 +203,8 @@ def predict_digit(request):
         predictions=reconstructed_model.predict(norm_img)
         result += str(np.argmax(predictions))
         print("predicted value: "+str(np.argmax(predictions)))
+    if result == "":
+        print("we facked up m8")
     return render(request, "index.html", {'prediction_number':result,'model':reconstructed_model.get_weights})
 
 
