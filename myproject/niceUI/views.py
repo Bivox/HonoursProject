@@ -141,12 +141,12 @@ def crop(img, x = 0, y = 0, w = 800, h = 800):
 
     # Setting the points for cropped image
     #for first section
+
     im1 = img[y:h+y, x:w+x]
-    
+    #print("img shape:",im1.shape)
     '''#cropping second half of image
     x1=w//2
     im2 = img[y:h, x1:w]'''
-    
     return im1
 
 
@@ -154,32 +154,44 @@ def predict_digit(request):
     # Load prebuilt model
     reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
     IMG_SIZE=28
-    img = cv2.imread('/Users/Marco/Downloads/hand_written_digit.png')
+    img = cv2.imread('/Users/beril/Downloads/hand_written_digit.png')
+    print("img shape:",img.shape)
     #TODO img_left, img_right = crop(img)
-    canny_output=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    canny_output=img
+    print("canny shape:",canny_output.shape)
     #canny_output = cv2.Canny(img, 100, 100 * 2)
+    #canny_output=cv2.blur(canny_output, (5,5))
     con = cv2.findContours(canny_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     con = con[0] if len(con) == 2 else con[1]
     #creating a list of cropped imgs
     lst = []
     for c in con:
         x, y, w, h = cv2.boundingRect(c)
+        if w<100 or h<100:
+            continue
         print(x, y, w, h)
         cropped = crop(canny_output, x, y, w, h)
+        cropped = cv2.cvtColor(cropped,cv2.COLOR_BGR2GRAY)
+        print("--------- cropped dtype",cropped.shape)
+        result_image = np.full((800,800,3),(0,0,0), dtype=np.uint8)
+        print("1----result_image shape:",result_image.shape)
+        # copy img image into center of result image
+        result_image[400:400 + h, 400:400+w] = cropped
+        print("result_image shape:",result_image.shape)
 
         print(con)
-        cv2.imshow("cropped", cropped)
+        '''cv2.imshow("cropped", cropped)
         cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        lst.append(cropped)
+        cv2.destroyAllWindows()'''
+        lst.append(result_image)
     #cv2.imshow("canny", canny_output)
     print("length of con: "+str(len(con)))
     '''if cv2.countNonZero(img_right) == 0:
         print ("Image is black")
     else:
         print ("Colored image")'''
-
-    '''for c in lst:
+    result=""
+    for c in lst:
         
         resized=cv2.resize(c, (IMG_SIZE,IMG_SIZE), interpolation=cv2.INTER_AREA)
     
@@ -188,7 +200,8 @@ def predict_digit(request):
         #kernel operation of convolution layer
         norm_img=np.array(norm_img).reshape(-1, IMG_SIZE, IMG_SIZE,1) 
         predictions=reconstructed_model.predict(norm_img)
-        print("predicted value: "+str(np.argmax(predictions)))'''
-    return render(request, "index.html", {'prediction_number':69420,'model':reconstructed_model.get_weights})
+        result += str(np.argmax(predictions))
+        print("predicted value: "+str(np.argmax(predictions)))
+    return render(request, "index.html", {'prediction_number':result,'model':reconstructed_model.get_weights})
 
 
