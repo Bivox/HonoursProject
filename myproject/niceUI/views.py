@@ -66,7 +66,7 @@ def load_model(request):
     reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
     return render(request, 'index.html',{'new_model':reconstructed_model.get_weights})
 
-def digit_rec_model(request):
+def digit_rec_model():
 
     print("We've started...")
     #hand written characters 28x28 sized images of 0...9
@@ -135,7 +135,7 @@ def digit_rec_model(request):
     # Evaluating the predictions
     # Comparing test data vs predicted data
 
-    return render(request, "index.html", {'model':model.get_weights})
+    return model
 
 def crop(request, img):
     
@@ -160,17 +160,22 @@ def crop(request, img):
 
 def predict_digit(request):
    # Load prebuilt model
-   #reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
+   reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
    IMG_SIZE=28
-   img = cv2.imread('/Users/beril/Downloads/hand_written_digit.png')
+   img = cv2.imread('/Users/Marco/Downloads/hand_written_digit.png')
    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
    resized=cv2.resize(gray, (IMG_SIZE,IMG_SIZE), interpolation=cv2.INTER_AREA)
+   #show image
+   '''cv2.imshow('Example - Show image in window',resized)
+   cv2.waitKey(0) # waits until a key is pressed
+   cv2.destroyAllWindows() # destroys the window showing image
+   '''
    # 0 to 1 scaling
    norm_img=tf.keras.utils.normalize(resized,axis=1) 
    #kernel operation of convolution layer
    norm_img=np.array(norm_img).reshape(-1, IMG_SIZE, IMG_SIZE,1) 
    predictions=reconstructed_model.predict(norm_img)
    print(np.argmax(predictions))
-   return (request, "index.html", {'prediction_number':np.argmax(predictions),'model':reconstructed_model.get_weights})
+   return render(request, "index.html", {'prediction_number':np.argmax(predictions),'model':reconstructed_model.get_weights})
 
 
