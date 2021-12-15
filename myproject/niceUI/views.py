@@ -10,6 +10,7 @@ import cv2
 import base64
 from flask import Flask, render_template, request, jsonify
 from PIL import Image
+
 from itertools import product
 import os
 from django.shortcuts import render
@@ -171,19 +172,19 @@ def crop(request, img):
     return (request, "index.html", {'cropped_img':im1})
 
 
-def predict_digit(request, canvas_img, model):
+def predict_digit(request):
    # Load prebuilt model
    #reconstructed_model = tf.lite.TFLiteConverter.from_keras_model('niceUI/digit_rec.h5')
-
-   img = cv2.imread(canvas_img)
+   
+   img = cv2.imread('C:/Users/Marco/Downloads/hand_written_digit.png')
    gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
    resized=cv2.resize(gray, (28,28), interpolation=cv2.INTER_AREA)
    # 0 to 1 scaling
    norm_img=tf.keras.utils.normalize(resized,axis=1) 
    #kernel operation of convolution layer
    norm_img=np.array(norm_img).reshape(-1, img, img,1) 
-   predictions=model.predict(norm_img)
+   predictions=reconstructed_model.predict(norm_img)
    print(np.argmax(predictions))
-   return (request, "index.html", {'prediction_number':np.argmax(predictions),'model':model.get_weights})
+   return (request, "index.html", {'prediction_number':np.argmax(predictions),'model':reconstructed_model.get_weights})
 
 
