@@ -323,6 +323,7 @@
 										<div class="home_slider_content">
 											<div class="home_title">
 												<h2>NEURAL NET PROJECT</h2>
+												<h4>By Beril Borali and Marco Najem</h4>
 												
 											</div>
 										</div>
@@ -335,9 +336,11 @@
 
 				<div class="home_page_nav">
 					<ul class="d-flex flex-column align-items-end justify-content-end">
-						<li><a href="#" data-scroll-to="#destinations">STEP 1<span>01</span></a></li>
-						<li><a href="#" data-scroll-to="#testimonials">STEP 2<span>02</span></a></li>
-						<li><a href="#" data-scroll-to="#news">STEP 3<span>03</span></a></li>
+						<li><a href="#" data-scroll-to="#destinations">INTRODUCTIONS<span>01</span></a></li>
+						<li><a href="#" data-scroll-to="#testimonials">METHODOLOGY<span>02</span></a></li>
+						<li><a href="#" data-scroll-to="#news">SOLUTIONS<span>03</span></a></li>
+						<li><a href="#" data-scroll-to="#testimonials">RESULTS<span>02</span></a></li>
+						<li><a href="#" data-scroll-to="#news">CONCLUSION<span>03</span></a></li>
 					</ul>
 				</div>
 			</div>
@@ -354,14 +357,9 @@
 					<div class="col text-center">
 						<div class="section_subtitle">STEP 1:</div>
 						<div class="section_title">
-							<h2>CLEANING OUR DATA</h2>
+							<h2>INTRODUCTION</h2>
 						</div>
-						{% block contents %}
-						<form action="add" method='post'>
-							{% csrf_token %}
-							Use this code for when adding functions to buttons. Current function for this button is "add": <input type="submit">
-						</form>
-						{% endblock %}
+
 						<img src="{% static 'images/89.png' %}">
 						<img src="{% static 'images/ba.png' %}">
 					</div>
@@ -407,7 +405,7 @@
 					<div class="col text-center">
 						<div class="section_subtitle">STEP 2:</div>
 						<div class="section_title">
-							<h2>TRAINING OUR MACHINE</h2>
+							<h2>METHODOLOGY</h2>
 						</div>
 						
 					</div>
@@ -450,6 +448,139 @@
 		<!-- News -->
 
 		<div class="news" id="news">
+			<div class="container">
+				<div class="row">
+					<div class="col-xl-8">
+						<div class="news_container">
+							<div class="section_subtitle">STEP 3:</div>
+						<div class="section_title">
+							<h2>SOLUTIONS</h2>
+						</div>
+							<!-- News Post -->
+							<div
+								class="news_post d-flex flex-md-row flex-column align-items-start justify-content-start">
+								<div class="news_post_image"><img src="{% static 'images/puzzle1.jfif' %}" alt=""></div>
+								<div class="news_post_content">
+									<div class="news_post_date d-flex flex-row align-items-end justify-content-start">
+										<div>01</div>
+										<div>piece</div>
+									</div>
+									<div class="news_post_title"><a href="#">The actual AI itself</a>
+									</div>
+									<div class="news_post_category">
+										<ul>
+											<li><a href="#">lifestyle & travel</a></li>
+										</ul>
+									</div>
+									<div class="news_post_text">
+										<p>Pellentesque sit amet elementum ccumsan sit amet mattis eget,
+											tristique at
+											leo. Vivamus massa.Tempor massa et laoreet.</p>
+									</div>
+								</div>
+							</div>
+
+							<!-- News Post -->
+							<div
+								class="news_post d-flex flex-md-row flex-column align-items-start justify-content-start">
+								<div class="news_post_image"><img src="{% static 'images/puzzle2.jfif' %}" alt=""></div>
+								<div class="news_post_content">
+									<div class="news_post_date d-flex flex-row align-items-end justify-content-start">
+										<div>02</div>
+										<div>piece</div>
+									</div>
+									<div class="news_post_title"><a href="#">Connecting our AI program to a website</a>
+									</div>
+									<div class="news_post_category">
+										<ul>
+											<li><a href="#">lifestyle & travel</a></li>
+										</ul>
+									</div>
+									<div class="news_post_text">
+										<p>Tempor massa et laoreet malesuada. Pellentesque sit amet
+											elementum ccumsan
+											sit amet mattis eget, tristique at leo.</p>
+									</div>
+								</div>
+							</div>
+
+							<!-- News Post -->
+							<div
+								class="news_post d-flex flex-md-row flex-column align-items-start justify-content-start">
+								<div class="news_post_image"><img src="{% static 'images/puzzle3.jfif' %}" alt=""></div>
+								<div class="news_post_content">
+									<div class="news_post_date d-flex flex-row align-items-end justify-content-start">
+										<div>03</div>
+										<div>piece</div>
+									</div>
+									<div class="news_post_title"><a href="#">Best tips to travel light</a>
+									</div>
+									<div class="news_post_category">
+										<ul>
+											<li><a href="#">lifestyle & travel</a></li>
+										</ul>
+									</div>
+									<div class="news_post_text">
+										<p>Vivamus massa.Tempor massa et laoreet malesuada. Aliquam nulla
+											nisl, accumsan
+											sit amet mattis.</p>
+									</div>
+								</div>
+							</div>
+							<!-- News Post -->
+							<div
+								class="news_post d-flex flex-md-row flex-column align-items-start justify-content-start">
+								<div class="news_post_image"><img src="{% static 'images/puzzle4.jfif' %}" alt=""></div>
+								<div class="news_post_content">
+									<div class="news_post_date d-flex flex-row align-items-end justify-content-start">
+										<div>04</div>
+										<div>piece</div>
+									</div>
+									<div class="news_post_title"><a href="#"></a>
+									</div>
+									<div class="news_post_category">
+										<ul>
+											<li><a href="#">lifestyle & travel</a></li>
+										</ul>
+									</div>
+									<div class="news_post_text">
+										<p>Vivamus massa.Tempor massa et laoreet malesuada. Aliquam nulla
+											nisl, accumsan
+											sit amet mattis.</p>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+					<!-- News Sidebar -->
+					<div class="col-xl-4">
+						<div class="travello">
+							<div class="background_image"
+								style="background-image:url({% static 'images/travello.jpg)}"></div>
+							<div class="travello_content">
+								<div class="travello_content_inner">
+									<div></div>
+									<div></div>
+								</div>
+							</div>
+							<div class="travello_container">
+								<a href="#">
+									<div class="d-flex flex-column align-items-center justify-content-end">
+										<span class="travello_title">Get a 20% Discount</span>
+										<span class="travello_subtitle">Buy Your Vacation Online Now</span>
+									</div>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- News -->
+
+		<div class="newS" id="newsZ">
 			<div class="container">
 				<div class="row">
 					<div class="col-xl-8">
