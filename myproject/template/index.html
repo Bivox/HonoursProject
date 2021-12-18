@@ -362,7 +362,7 @@
 					</div>
 				</div>
 				<div class="row destinations_row">
-					<div class="col">
+					<div class="col text-center">
 						<div class="destinations_container item_grid">
 
 							<div class="footer_contact_title">
@@ -376,20 +376,22 @@
 				<br>
 				<br>
 				<br>
-				
+				<div class="text-center">
 				<img src="{% static 'images/step.jfif' %}" width="500" height="570">
+			</div>
 				<br>
 				<br>
 				<br>
 				<br>
-				<div class="footer_contact_title">
+				<div class="footer_contact_title text-center">
 					<h3 style="color :black; "> RECOGNIZING HUMAN HAND-WRITING</h3>  
 					
 				</div>
 				<br>
 				<br>
-				
+				<div class="text-center">
 				<img src="{% static 'images/writing.jfif' %}" width="500" height="570">
+			</div>
 			</div>
 		</div>
 
@@ -444,10 +446,13 @@
 						<img src="{% static 'images/right-arrow.png' %}" width="25" height="35">
 					<!-- prediction results / output -->
 					<div class="col d-inline">
-						
+					<!-- 	
 						<span class="d-inline-block text-white">6</span>
 						<span class="d-inline-block text-white">5</span>
-						<span class="d-inline-block text-white">9</span>
+						<span class="d-inline-block text-white">9</span>   -->
+						<div class="d-inline-block text-white" style="font-size:xx-large">6</div>
+						<div class="d-inline-block text-white" style="font-size:xx-large">5</div>
+						<div class="d-inline-block text-white" style="font-size:xx-large">9</div>
 					</div>
 
 				</div>   <!-- end of How it works-->
@@ -625,7 +630,7 @@
 				{% endblock %}
 				</div>
 					<br>
-				div class="text-center">
+				<div class="text-center">
 						<h3>My predicted number: {{prediction_number}}</h3>
 						<h3>Prediction accuracy : {{pred_accuracy}}</h3>
 					</div>
