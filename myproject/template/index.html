@@ -610,12 +610,13 @@
 				<div class="col">
 					
 					
-					<div id="new_image">
+					<div  class="text-center" id="new_image">
 						
 						<canvas id="canvas" width="800" height="800"></canvas>
 						<br>
 						<a id="link"></a>
 					</div>
+					<div  class="text-center">
 				<button id="butn" class="button" size="30"> Clear canvas</button>
 				<button onclick="addCode()" class="button" size="30">Save Image</button>
 				{% block content %}
@@ -624,6 +625,7 @@
 						<input class="button" size="30" type="submit">
 					</form>
 				{% endblock %}
+				</div>
 				div class="text-center">
 						<h3>My predicted number: {{prediction_number}}</h3>
 						<h3>Prediction accuracy : {{pred_accuracy}}</h3>
