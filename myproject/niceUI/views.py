@@ -269,8 +269,8 @@ def predict_digit(request):
         predictions=reconstructed_model.predict(norm_img)
         result += str(np.argmax(predictions))
         print("predicted value: "+str(np.argmax(predictions)))
-    if result == "":
-        print("we facked up m8")
-    return render(request, "index.html", {'prediction_number':result,'model':reconstructed_model.get_weights})
+    accuracy="~ 99%"
+    return render(request, "index.html", {'prediction_number':result, "pred_accuracy":accuracy, 'model':reconstructed_model.get_weights})
+
 
 
