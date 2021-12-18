@@ -1,0 +1,877 @@
+{% load static %}
+
+{% static "images" as baseUrl %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<script type="text/javascript">
+
+		
+
+		function startup(){
+            clearBtn = document.getElementById('clr').addEventListener('click', clearCanvas);
+
+            canvas = document.getElementById("canvas");
+            context = canvas.getContext("2d");  
+            
+            
+            canvas.addEventListener("mousedown", function(e){
+                var mouseX = e.pageX - this.offsetLeft;
+                var mouseY = e.pageY - this.offsetTop;
+                paint = true;
+                addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
+                draw();
+            });
+
+            canvas.addEventListener("mousemove", function(e){
+                if(paint){
+                    addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+                    draw();
+                }
+            });
+
+            canvas.addEventListener("mouseup", function(e){
+                paint = false;
+                predict();
+            });
+
+            canvas.addEventListener("mouseleave", function(e){
+                paint = false;
+            }); 
+            
+            canvas.addEventListener('touchstart', function(e){                
+                if (e.touches.length == 1){ 
+                    var touch = e.touches[0];         
+                    paint = true;
+                    addClick(touch.pageX-touch.target.offsetLeft, touch.pageY-touch.target.offsetTop);
+                    draw();
+                }
+            });
+            
+            canvas.addEventListener('touchend', function(e){
+                paint = false;
+                predict();
+            });
+            
+            canvas.addEventListener('touchmove', function(e){
+                if(paint){
+                    if (e.touches.length == 1) { 
+                        var touch = e.touches[0];
+                        addClick(touch.pageX-touch.target.offsetLeft, touch.pageY-touch.target.offsetTop, true);
+                        draw();
+                        event.preventDefault();
+                    }     
+                }
+            });
+        }
+		function addCode() {
+			canvas = document.getElementById('canvas'),
+			dataUrl = canvas.toDataURL(),
+			imageFoo = document.createElement('img');
+			imageFoo.src = dataUrl;
+		
+			// Style your image here
+			imageFoo.style.width = '100px';
+			imageFoo.style.height = '100px';
+			var src = document.getElementById("new_image");
+			var link = document.getElementById('link');
+			link.setAttribute('download', 'hand_written_digit.png');
+			link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+			link.click();
+			src.appendChild(imageFoo);
+		}
+		//credit to: https://github.com/wosaku/handwritten-digits-recognition
+		function predict(){
+
+			console.log("hello")
+			/*****************************
+			*** GET INDIVIDUAL DIGITS  *** 
+			*****************************/  
+			//canvas = document.getElementById('canvas'),
+			//
+
+			canvas = document.getElementById('canvas');
+			imageWidth = canvas.width
+			imageHeight = canvas.height
+			dataUrl = canvas.toDataURL();
+			imageFoo = document.createElement('img');
+			imageFoo.src = dataUrl;
+		
+			// Style your image here
+			imageFoo.style.width = '100px';
+			imageFoo.style.height = '100px';
+			var src = document.getElementById("new_image");
+			src.appendChild(imageFoo);
+			context = canvas.getContext("2d");
+			
+			// Get ImageData to transform the image to array of pixels
+			//var imageDataOriginal = context.getImageData(0, 0, canvas.width, canvas.height);
+			var imageDataOriginal = context.getImageData(0, 0, canvas.width, canvas.height);
+			console.log(imageDataOriginal)
+			//console.log(imageFoo.)
+			// The Image contains 160,000 (400 X 400) pixels.
+			// The ImageDataOriginal contains 160,000 * 4 rows.
+			// Each 4 rows is one pixel, row 0 is pixel 1 R channel (Red)
+			//                           row 1 is pixel 1 G channel (Green)
+			//                           row 2 is pixel 1 B channel (Blue)
+			//                           row 3 is pixel 1 A channel (Alpha, transparency)        
+
+			// Iterate through the array and get only the Aplha channel, which is 255 for black and 0 for white
+			var data = imageDataOriginal.data
+			for(var i = 0, n = imageDataOriginal.data.length; i < n; i += 4) {
+				var red = imageDataOriginal.data[i];
+				var green = imageDataOriginal.data[i + 1];
+				var blue = imageDataOriginal.data[i + 2];
+				var alpha = imageDataOriginal.data[i + 3];
+				if(alpha == 0){
+					console.log(imageDataOriginal.data[i + 3]);
+				}
+			}
+			  // pick out pixel data from x, y coordinate
+			var x = 0;
+			var y = 0;
+			var red = data[((imageWidth * y) + x) * 4];
+			var green = data[((imageWidth * y) + x) * 4 + 1];
+			var blue = data[((imageWidth * y) + x) * 4 + 2];
+			var alpha = data[((imageWidth * y) + x) * 4 + 3];
+			console.log(red)
+			  // iterate over all p
+			var imageArrayOriginal = [];
+			for (var i = 3; i<160000; i+=4){
+				imageArrayOriginal[i] = imageDataOriginal.data[(i)];            
+			}
+			
+			// Separate different numbers by grouping adjacent pixels         
+			var k = 1;  
+			window['arrayN' + k] = [];
+			for (var row = 0; row<400; row++){            
+				for (var column = 0; column < 400; column++){
+					if (imageDataOriginal.data[(row*400 + column)*4+3] > 0){
+						
+						// Get the adjacent pixels if stroke is continuous and assign it to an array
+						var nextColumn = 1;
+						window['arrayN' + k].push(row*400 + column);
+						
+						/**
+						while ( imageFoo.data[(row*400 + column + nextColumn)*4+3] != 0){
+							window['arrayN' + k].push(row*400 + column + nextColumn);
+							nextColumn++;
+							//console.log("step 2 cleared")
+						} **/
+			               
+					   /**
+						// Check if this array is adjacent to another array in a previous row 
+						// k is the number or continuous arrays that have been identified
+						var arrayAdjusted = [];
+						var arrayToMerge = [];
+				 
+						for (var l = 1; l <= k; l++){
+							for (var element = 0; element < window['arrayN' + k].length; element++){
+								arrayAdjusted[element] = window['arrayN' + k][element] - 400;    
+								if (window['arrayN' + l].includes(arrayAdjusted[element])){
+									arrayToMerge.push(l);
+									arrayToMerge.push(k);    
+									break;
+								}
+							}              
+						}
+						
+						// Remove duplicated from array; decrease count k
+						if (arrayToMerge.length > 1) {                            
+							arrayToMerge = Array.from(new Set(arrayToMerge));
+							k--;
+						};
+  
+						
+						// Merge adjacent arrays into the same digit; and clear that array
+						for (var f = 1; f < arrayToMerge.length ; f++){
+							window['arrayN' + arrayToMerge[0]] = window['arrayN' + arrayToMerge[0]].concat(window['arrayN' + arrayToMerge[f]]);
+							window['arrayN' + arrayToMerge[f]] = [];
+						}
+
+						// Increase count k, initiate arrayNk, move to the correct column
+						k++;
+						window['arrayN' + k] = [];
+						column = column + nextColumn-1;
+					}
+				}
+			};
+			/**
+			console.log("Step 2 cleared ")
+			// Check which arrays are valid digits (length > 0); those that are length 0 are temporary arrays
+			var validaArrays = [];
+			for (var i = 1;  i < k; i++){
+				if (window['arrayN' + i].length > 0){
+					validaArrays.push(i);
+				}
+			}
+			
+			//// Process Neural Network for each digit
+			for (var i = 0; i < validaArrays.length; i++){
+				print(validaArrays);
+				//processIndividualImage(window['arrayN' + validaArrays[i]]);
+			}**/
+		}}}
+		};
+		</script>
+<head>
+	<title>Honours Project</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="Travello template project">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="{% static 'styles/bootstrap4/bootstrap.min.css' %}">
+	<link href="{% static 'plugins/font-awesome-4.7.0/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="{% static 'plugins/OwlCarousel2-2.2.1/owl.carousel.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'plugins/OwlCarousel2-2.2.1/owl.theme.default.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'plugins/OwlCarousel2-2.2.1/animate.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'styles/main_styles.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'styles/responsive.css' %}">
+</head>
+
+<body>
+
+	<div class="super_container">
+
+		<!-- Header -->
+
+		<header class="header">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<div class="header_content d-flex flex-row align-items-center justify-content-start">
+							<div class="header_content_inner d-flex flex-row align-items-end justify-content-start">
+								<div class="logo"><a href="index.html">Honours Project</a></div>
+								<nav class="main_nav">
+									<ul class="d-flex flex-row align-items-start justify-content-start">
+										<li class="active"><a href="index.html"></a></li>
+										<li><a href="about.html"></a></li>
+									</ul>
+								</nav>
+								<div class="header_phone ml-auto"></div>
+
+								<!-- Hamburger -->
+
+								<div class="hamburger ml-auto">
+									<i class="fa fa-bars" aria-hidden="true"></i>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="header_social d-flex flex-row align-items-center justify-content-start">
+				<ul class="d-flex flex-row align-items-start justify-content-start">
+					
+				</ul>
+			</div>
+		</header>
+
+		<!-- Menu -->
+
+		<div class="menu">
+			<div class="menu_header d-flex flex-row align-items-center justify-content-start">
+				<div class="menu_logo"><a href="index.html">Honours Project</a></div>
+				<div class="menu_close_container ml-auto">
+					<div class="menu_close">
+						<div></div>
+						<div></div>
+					</div>
+				</div>
+			</div>
+			<div class="menu_content">
+				<ul>
+					<li><a href="index.html">Home</a></li>
+					<li><a href="about.html">About us</a></li>
+				</ul>
+			</div>
+			<div class="menu_social">
+				<div class="menu_phone ml-auto">We hope you enjoy!</div>
+				<ul class="d-flex flex-row align-items-start justify-content-start">
+					<li><a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+					<li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+					<li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+					<li><a href="#"><i class="fa fa-dribbble" aria-hidden="true"></i></a></li>
+					<li><a href="#"><i class="fa fa-behance" aria-hidden="true"></i></a></li>
+					<li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- Home -->
+
+		
+		<div class="home">
+
+			<!-- Home Slider -->
+			<div class="home_slider_container">
+				<div class="owl-carousel owl-theme home_slider">
+
+					<!-- Slide -->
+					<div class="owl-item">
+						<div class="background_image"
+							style="background-image:url({% static 'images/home_slider.jpg' %})"></div>
+
+						<div class="home_slider_content_container">
+							<div class="container">
+								<div class="row">
+									<div class="col">
+										<div class="home_slider_content">
+											<div class="home_title">
+												<h2>NEURAL NET PROJECT</h2>
+												<h3 style="color :white; ">Hand-written Digit Recognition</h3>
+												<h4 style="color :white; " >By Beril Borali and Marco Najem</h4>
+												
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="home_page_nav">
+					<ul class="d-flex flex-column align-items-end justify-content-end">
+						<li><a href="#" data-scroll-to="#destinations">INTRODUCTIONS<span>01</span></a></li>
+						<li><a href="#" data-scroll-to="#testimonials">METHODOLOGY<span>02</span></a></li>
+						<li><a href="#" data-scroll-to="#news">SOLUTIONS<span>03</span></a></li>
+						<li><a href="#" data-scroll-to="#step4">RESULTS<span>04</span></a></li>
+						<li><a href="#" data-scroll-to="#step5">CONCLUSION<span>05</span></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		
+		
+
+		<!-- Destinations -->
+
+		<div class="destinations" id="destinations">
+			<div class="container">
+				<div class="row">
+					<div class="col text-center">
+						<div class="section_subtitle">STEP 1:</div>
+						<div class="section_title">
+							<h2>INTRODUCTION</h2>
+						</div>
+
+						<img src="{% static 'images/terminator.jfif' %}" width="500" 
+						height="570">
+						<img src="{% static 'images/irobot.jfif' %}" width="500" 
+						height="570">
+					</div>
+				</div>
+				<div class="row destinations_row">
+					<div class="col text-center">
+						<div class="destinations_container item_grid">
+
+							<div class="footer_contact_title">
+								<h3 style="color :black; "> HOW ARE THEY ABLE TO SEE?</h3>  
+								
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				<br>
+				<br>
+				<br>
+				<div class="text-center">
+				<img src="{% static 'images/step.jfif' %}" width="500" height="570">
+			</div>
+				<br>
+				<br>
+				<br>
+				<br>
+				<div class="footer_contact_title text-center">
+					<h3 style="color :black; "> RECOGNIZING HUMAN HAND-WRITING</h3>  
+					
+				</div>
+				<br>
+				<br>
+				<div class="text-center">
+				<img src="{% static 'images/writing.jfif' %}" width="500" height="570">
+			</div>
+			</div>
+		</div>
+
+		<!-- Testimonials -->
+
+	<div class="testimonials" id="testimonials">
+		<div class="parallax_background parallax-window" data-parallax="scroll"
+			data-image-src="{% static 'images/blue_bg.png' %}" data-speed="0.8"></div>
+		<div class="container">
+			<div class="row">
+				<div class="col text-center">
+					<div class="section_subtitle">STEP 2:</div>
+					<div class="section_title">
+						<h2>METHODOLOGY</h2>
+					</div>
+				<!-- Type of learning -->
+				<div class="col text-center">
+					<h2>Type of learning</h2>
+					<img src="{% static 'images/supervised-machine-learning.png' %}"  width="800" 
+					 >  <!-- end of Type of learning -->
+				</div>
+					<br><br><br><br>
+				<div class="col text-center">	
+				<!-- Dataset -->
+					<h2>Dataset used</h2>
+					<img src="{% static 'images/mnist_digits.jpeg' %}" width="800">	<!-- end of Dataset -->
+				</div>
+				<br><br><br><br>
+				<!-- How it works-->
+				<div class="col text-center p-10">
+					<h2>How it works</h2>
+					<br><br>
+					<!-- canvas 659 -->
+					<div class="col d-inline">
+						<img src="{% static 'images/hand-659.png' %}" width="300">
+					</div>
+						<img src="{% static 'images/right-arrow.png' %}" width="25" height="35">
+					
+
+					
+					<!-- split image 6-5-9 -->
+					<div class="col d-inline">
+						<img class="d-inline-block" src="{% static 'images/hand-small-6.png' %}" width="70">
+						<img class="d-inline-block" src="{% static 'images/hand-small-5.png' %}" width="70">
+						<img class="d-inline-block" src="{% static 'images/hand-small-9.png' %}" width="70">
+					</div>
+						<img src="{% static 'images/right-arrow.png' %}" width="25" height="35">
+					<!-- predict with trained model -->
+					<div class="col d-inline">
+						<img src="{% static 'images/artificial-intelligence.png' %}" width="200">
+					</div>
+						<img src="{% static 'images/right-arrow.png' %}" width="25" height="35">
+					<!-- prediction results / output -->
+					<div class="col d-inline">
+					<!-- 	
+						<span class="d-inline-block text-white">6</span>
+						<span class="d-inline-block text-white">5</span>
+						<span class="d-inline-block text-white">9</span>   -->
+						<div class="d-inline-block text-white" style="font-size:xx-large">6</div>
+						<div class="d-inline-block text-white" style="font-size:xx-large">5</div>
+						<div class="d-inline-block text-white" style="font-size:xx-large">9</div>
+					</div>
+
+				</div>   <!-- end of How it works-->
+				<br><br><br><br>
+				<!--Connected to a website-->	
+				<div class="col text-center">	
+						<h2>Why connected to a website?</h2>
+					<img src="{% static 'images/web.jpg' %}" width="500">
+				</div>   <!-- end of Connected to a website-->
+					
+				</div>		
+					
+				</div>
+			</div>
+			<div class="row testimonials_row">
+				<div class="col">
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+		<!-- News -->
+
+		<div class="news" id="news">
+			<div class="container">
+				<div class="row">
+					<div class="col-xl-8">
+						<div class="news_container">
+							<div class="section_subtitle">STEP 3:</div>
+						<div class="section_title">
+							<h2>SOLUTIONS</h2>
+						</div>
+							<!-- News Post -->
+							<div
+								class="news_post d-flex flex-md-row flex-column align-items-start justify-content-start">
+								<div class="news_post_image"><img src="{% static 'images/puzzle1.jfif' %}" alt=""></div>
+								<div class="news_post_content">
+									<div class="news_post_date d-flex flex-row align-items-end justify-content-start">
+										<div>01</div>
+										<div>piece</div>
+									</div>
+									<div class="news_post_title"><a href="#">The AI itself</a>
+									</div>
+									<div class="news_post_category">
+
+									</div>
+									<div class="news_post_text">
+										<h4>These were far from performant and had difficulty running properly let alone be of any use.</h4>
+									</div>
+								</div>
+							</div>
+
+							<!-- News Post -->
+						
+							<div
+								class="news_post d-flex flex-md-row flex-column align-items-start justify-content-start">
+								<div class="news_post_image"><img src="{% static 'images/puzzle2.jfif' %}" alt=""></div>
+								<div class="news_post_content">
+									<div class="news_post_date d-flex flex-row align-items-end justify-content-start">
+										<div>02</div>
+										<div>piece</div>
+									</div>
+									<div class="news_post_title"><a href="#">Connecting our AI program to a website</a>
+									</div>
+									<div class="news_post_category">
+
+									</div>
+									<div class="news_post_text">
+										<h4>Create a useful and good-looking website from scratch.</h4>
+									</div>
+								</div>
+							</div>
+
+							<!-- News Post -->
+							<div
+								class="news_post d-flex flex-md-row flex-column align-items-start justify-content-start">
+								<div class="news_post_image"><img src="{% static 'images/puzzle3.jfif' %}" alt=""></div>
+								<div class="news_post_content">
+									<div class="news_post_date d-flex flex-row align-items-end justify-content-start">
+										<div>03</div>
+										<div>piece</div>
+									</div>
+									<div class="news_post_title"><a href="#">Adding a canvas that would allow a user to draw</a>
+									</div>
+									<div class="news_post_category">
+									</div>
+									<div class="news_post_text">
+										<h4>Adding a canvas that would allow a user to draw a digit and would feed it to the AI.</h4>
+									</div>
+								</div>
+							</div>
+							<!-- News Post -->
+							
+							<div
+								class="news_post d-flex flex-md-row flex-column align-items-start justify-content-start">
+								<div class="news_post_image"><img src="{% static 'images/puzzle4.jfif' %}" alt=""></div>
+								<div class="news_post_content">
+									<div class="news_post_date d-flex flex-row align-items-end justify-content-start">
+										<div>04</div>
+										<div>piece</div>
+									</div>
+									<div class="news_post_title"><a href="#">Doing better than just an AI that could only see one number.</a>
+									</div>
+									<div class="news_post_category">
+									</div>
+									<div class="news_post_text">
+										<h4>By identifying each item drawn and copying that single item onto its own new canvas.</h4>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+					<!-- News Sidebar -->
+					<div class="col-xl-4">
+						<div class="travello">
+							<div class="background_image"
+								style="background-image:url({% static 'images/travello.jpg)}"></div>
+							<div class="travello_content">
+								<div class="travello_content_inner">
+									<div></div>
+									<div></div>
+								</div>
+							</div>
+							<div class="travello_container">
+								<a href="#">
+									<div class="d-flex flex-column align-items-center justify-content-end">
+										<h3 style="color :white; ">We love AI!</h3>
+										<span class="travello_subtitle">We hope you're enjoying the presentation</span>
+									</div>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<!-- Testimonials -->
+
+	<div class="testimonials" id="step4">
+		<div class="parallax_background parallax-window" data-parallax="scroll"
+			data-image-src="{% static 'images/blue_bg.png' %}" data-speed="0.8"></div>
+		<div class="container">
+			<div class="row">
+				<div class="col text-center">
+					<div class="section_subtitle">STEP 4:</div>
+					<div class="section_title">
+						<h2>RESULTS</h2>
+					</div>
+					
+				</div>
+			</div>
+			<div class="row testimonials_row">
+				<div class="col">
+					
+					
+					<div  class="text-center" id="new_image">
+						
+						<canvas id="canvas" width="800" height="800"></canvas>
+						<br>
+						<a id="link"></a>
+					</div>
+					<br>
+					<div  class="text-center">
+				<button id="butn" class="button" size="30"> Clear canvas</button>
+				<button onclick="addCode()" class="button" size="30">Save Image</button>
+				{% block content %}
+					<form action="predict_digit" method='post'>
+						{% csrf_token %}
+						<br>
+						<input class="button" size="30" type="submit">
+					</form>
+				{% endblock %}
+				</div>
+					<br>
+				<div class="text-center">
+						<h3>My predicted number: {{prediction_number}}</h3>
+						<h3>Prediction accuracy : {{pred_accuracy}}</h3>
+					</div>
+
+				
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+		<!-- Footer -->
+		<div class="news" id="step5"></div>
+		<footer class="footer">
+			<div class="parallax_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/footer_1.jpeg' %}" data-speed="0.8">
+							</div>
+							
+							<div class="container" >
+								<div class="row">
+									<div class="col">
+										<div class="newsletter">
+											<div class="newsletter_title_container text-center">
+												<div class="newsletter_subtitle">STEP 5:</div>
+												<div class="newsletter_title">CONCLUSION
+												</div>
+											</div>
+										
+										</div>
+									</div>
+								</div>
+								<div class="row footer_contact_row">
+									<div class="col-xl-10 offset-xl-1">
+										<div class="row">
+
+											<!-- Footer Contact Item -->
+											<div class="col-xl-4 footer_contact_col">
+												<div
+													class="footer_contact_item d-flex flex-column align-items-center justify-content-start text-center">
+													<div class="footer_contact_icon"><img
+															src="{% static 'images/sign.svg' %}" alt="">
+													</div>
+													<div class="footer_contact_title">Different directions</div>
+													<div class="footer_contact_list">
+										
+													</div>
+												</div>
+											</div>
+											<!-- Footer Contact Item -->
+											<div class="col-xl-4 footer_contact_col">
+												
+											</div>
+											<!-- Footer Contact Item -->
+											<div class="col-xl-4 footer_contact_col">
+												<div
+													class="footer_contact_item d-flex flex-column align-items-center justify-content-start text-center">
+													<div class="footer_contact_icon"><img
+															src="{% static 'images/trekking.svg' %}" alt="">
+													</div>
+													<div class="footer_contact_title">Future directions</div>
+													<div class="footer_contact_list">
+													
+													</div>
+												</div>
+											</div>
+
+											
+
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col text-center">
+								<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+								Copyright &copy;
+								<script>document.write(new Date().getFullYear());</script> All rights
+								reserved | This template
+								is made
+								with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com"
+									target="_blank">Colorlib</a>
+								<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+							</div>
+							</footer>
+						</div>
+						<script>
+							// Canvas Drawing
+							window.addEventListener('load', ()=>{
+								const canvas = document.getElementById('canvas');
+								const context = canvas.getContext('2d');
+					
+								const canvasdata = document.getElementById('canvas').value;
+								if (canvasdata){
+									const image = new Image();
+									image.onload = ()=>{
+										context.drawImage(image, 0, 0);
+									};
+									image.src = canvasdata;
+								} else {
+									context.fillStyle = "black";
+									context.fillRect(0, 0, canvas.width, canvas.height);
+								}
+					
+								let radius = 10;
+								let start = 0;
+								let end = Math.PI * 2;
+								let dragging = false;
+					
+								context.lineWidth = radius * 4;
+								context.lineCap = 'round';
+					
+								const putPoint = (e)=>{
+									if (dragging){
+										context.fillStyle = "white";
+										context.strokeStyle = "white";
+										context.lineTo(e.offsetX, e.offsetY);
+										context.stroke();
+										context.beginPath();
+										context.arc(e.offsetX, e.offsetY, radius, start, end);
+										context.fill();
+										context.beginPath();
+										context.moveTo(e.offsetX, e.offsetY);
+									}
+								}
+					
+								const engage = (e)=>{
+									dragging = true;
+									putPoint(e);
+								}
+					
+								const disengage = ()=>{
+									dragging = false;
+									context.beginPath();
+								}
+					
+								canvas.addEventListener('mousedown', engage);
+								canvas.addEventListener('mousemove', putPoint);
+								canvas.addEventListener('mouseup', disengage);
+
+								
+
+								const butn = document.getElementById('butn');
+								
+								butn.addEventListener('click', ()=>{
+									const canvas = document.getElementById('canvas');
+									const context = canvas.getContext('2d');
+									context.filter = 'invert(0)';
+									context.fillStyle = "black";
+									context.fillRect(0, 0, canvas.width, canvas.height);
+								});
+								// Canvas Submit
+								const predict_button = document.getElementById('predict_button');
+
+								predict_button.addEventListener('click', ()=>{
+									const canvas = document.getElementById('canvas');
+									dataUrl = canvas.toDataURL();
+									imageFoo = document.createElement('img');
+									imageFoo.src = dataUrl;
+									predict(imageFoo)
+									});
+									
+								
+					
+								// Pastel
+								const pastel = document.querySelector('#pastel');
+								pastel.addEventListener('click', ()=>{
+									const canvas = document.querySelector('#canvas');
+									const context = canvas.getContext('2d');
+									context.filter = 'invert(0)';
+									radius = 10;
+								});
+					
+								// Eraser
+								const eraser = document.querySelector('#eraser');
+								eraser.addEventListener('click', ()=>{
+									const canvas = document.querySelector('#canvas');
+									const context = canvas.getContext('2d');
+									context.filter = 'invert(1)';
+									radius = 30;
+								});
+
+							});
+						</script>
+
+						
+							
+
+						<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+						<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+						<script src="{% static 'js/jquery-3.2.1.min.js' %}">
+						</script>
+						<script src="{% static 'styles/bootstrap4/popper.js' %}"></script>
+						<script src="{% static 'styles/bootstrap4/bootstrap.min.js' %}"></script>
+						<script src="{% static 'plugins/OwlCarousel2-2.2.1/owl.carousel.js' %}"></script>
+						<script src="{% static 'plugins/Isotope/isotope.pkgd.min.js' %}"></script>
+						<script src="{% static 'plugins/scrollTo/jquery.scrollTo.min.js' %}"></script>
+						<script src="{% static 'plugins/easing/easing.js' %}"></script>
+						<script src="{% static 'plugins/parallax-js-master/parallax.min.js' %}"></script>
+						<script src="{% static 'js/custom.js' %}"></script>
+
+						<style>
+							.divbackg {
+								background-image: src="{% static 'images/destination6' %}";
+							}
+							.button {
+								position: relative;
+								background-color: #3F51B5;
+								border-radius: 4px;
+								border: none;
+								font-size: 18px;
+								color: #FFFFFF;
+								padding: 10px;
+								width: 180px;
+								text-align: center;
+								-webkit-transition-duration: 0.4s;
+								transition-duration: 0.4s;
+								text-decoration: none;
+								overflow: hidden;
+								cursor: pointer;
+							}
+							.button:after {
+								content: "";
+								background: #f1f1f1;
+								display: block;
+								position: absolute;
+								padding-top: 300%;
+								padding-left: 350%;
+								margin-left: -20px;
+								margin-top: -120%;
+								opacity: 0;
+								transition: all 0.8s
+							}
+							.button:active:after {
+								padding: 0;
+								margin: 0;
+								opacity: 1;
+								transition: 0s
+							}
+						</style>
+</body>
+
+
+</html>
