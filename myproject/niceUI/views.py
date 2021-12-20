@@ -212,8 +212,7 @@ def predict_digit(request):
         result += str(np.argmax(predictions))
         print("predicted value: "+str(np.argmax(predictions)))
     #received from when we trained our model
-    accuracy="~ 99%"
-    return render(request, "index.html", {'prediction_number':result, "pred_accuracy":accuracy, 'model':reconstructed_model.get_weights})
+    return render(request, "index.html", {'prediction_number':result, 'model':reconstructed_model.get_weights})
 
 
 
