@@ -110,12 +110,9 @@ def digit_rec_model():
     model.add(Flatten()) #before using fully connected layer, need to be flatten so that 2D to 1D
 
 
-    # Fully connected layer #2   20x20=400 
-  
-
-    # Fully connected layer #3 (LAST)   20x20=400
+    # Fully connected layer #2 (LAST)   
     model.add(Dense(10))    # the last dense layer must be equal to 10
-    model.add(Activation("softmax")) #activation with Softmax (can also be sigmoid for BINARY classification)(class probabilities, not for binary)
+    model.add(Activation("softmax")) #activation with Softmax (can also be sigmoid for BINARY classification)(here we have non-binary class probabilities)
     # softmax is useful for probability distributions
 
     model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",metrics=['accuracy'])
@@ -135,7 +132,6 @@ def digit_rec_model():
     return model
 
 def crop(img, x = 0, y = 0, w = 800, h = 800):
-
     # Setting the points for cropped image
 
     im1 = img[y:h+y, x:w+x]
