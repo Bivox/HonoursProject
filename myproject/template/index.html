@@ -8,62 +8,7 @@
 
 		
 
-		function startup(){
-            clearBtn = document.getElementById('clr').addEventListener('click', clearCanvas);
-
-            canvas = document.getElementById("canvas");
-            context = canvas.getContext("2d");  
-            
-            
-            canvas.addEventListener("mousedown", function(e){
-                var mouseX = e.pageX - this.offsetLeft;
-                var mouseY = e.pageY - this.offsetTop;
-                paint = true;
-                addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
-                draw();
-            });
-
-            canvas.addEventListener("mousemove", function(e){
-                if(paint){
-                    addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
-                    draw();
-                }
-            });
-
-            canvas.addEventListener("mouseup", function(e){
-                paint = false;
-                predict();
-            });
-
-            canvas.addEventListener("mouseleave", function(e){
-                paint = false;
-            }); 
-            
-            canvas.addEventListener('touchstart', function(e){                
-                if (e.touches.length == 1){ 
-                    var touch = e.touches[0];         
-                    paint = true;
-                    addClick(touch.pageX-touch.target.offsetLeft, touch.pageY-touch.target.offsetTop);
-                    draw();
-                }
-            });
-            
-            canvas.addEventListener('touchend', function(e){
-                paint = false;
-                predict();
-            });
-            
-            canvas.addEventListener('touchmove', function(e){
-                if(paint){
-                    if (e.touches.length == 1) { 
-                        var touch = e.touches[0];
-                        addClick(touch.pageX-touch.target.offsetLeft, touch.pageY-touch.target.offsetTop, true);
-                        draw();
-                        event.preventDefault();
-                    }     
-                }
-            });
-        }
+		
 		function addCode() {
 			canvas = document.getElementById('canvas'),
 			dataUrl = canvas.toDataURL(),
@@ -80,139 +25,9 @@
 			link.click();
 			src.appendChild(imageFoo);
 		}
-		//credit to: https://github.com/wosaku/handwritten-digits-recognition
-		function predict(){
-
-			console.log("hello")
-			/*****************************
-			*** GET INDIVIDUAL DIGITS  *** 
-			*****************************/  
-			//canvas = document.getElementById('canvas'),
-			//
-
-			canvas = document.getElementById('canvas');
-			imageWidth = canvas.width
-			imageHeight = canvas.height
-			dataUrl = canvas.toDataURL();
-			imageFoo = document.createElement('img');
-			imageFoo.src = dataUrl;
+	
 		
-			// Style your image here
-			imageFoo.style.width = '100px';
-			imageFoo.style.height = '100px';
-			var src = document.getElementById("new_image");
-			src.appendChild(imageFoo);
-			context = canvas.getContext("2d");
-			
-			// Get ImageData to transform the image to array of pixels
-			//var imageDataOriginal = context.getImageData(0, 0, canvas.width, canvas.height);
-			var imageDataOriginal = context.getImageData(0, 0, canvas.width, canvas.height);
-			console.log(imageDataOriginal)
-			//console.log(imageFoo.)
-			// The Image contains 160,000 (400 X 400) pixels.
-			// The ImageDataOriginal contains 160,000 * 4 rows.
-			// Each 4 rows is one pixel, row 0 is pixel 1 R channel (Red)
-			//                           row 1 is pixel 1 G channel (Green)
-			//                           row 2 is pixel 1 B channel (Blue)
-			//                           row 3 is pixel 1 A channel (Alpha, transparency)        
-
-			// Iterate through the array and get only the Aplha channel, which is 255 for black and 0 for white
-			var data = imageDataOriginal.data
-			for(var i = 0, n = imageDataOriginal.data.length; i < n; i += 4) {
-				var red = imageDataOriginal.data[i];
-				var green = imageDataOriginal.data[i + 1];
-				var blue = imageDataOriginal.data[i + 2];
-				var alpha = imageDataOriginal.data[i + 3];
-				if(alpha == 0){
-					console.log(imageDataOriginal.data[i + 3]);
-				}
-			}
-			  // pick out pixel data from x, y coordinate
-			var x = 0;
-			var y = 0;
-			var red = data[((imageWidth * y) + x) * 4];
-			var green = data[((imageWidth * y) + x) * 4 + 1];
-			var blue = data[((imageWidth * y) + x) * 4 + 2];
-			var alpha = data[((imageWidth * y) + x) * 4 + 3];
-			console.log(red)
-			  // iterate over all p
-			var imageArrayOriginal = [];
-			for (var i = 3; i<160000; i+=4){
-				imageArrayOriginal[i] = imageDataOriginal.data[(i)];            
-			}
-			
-			// Separate different numbers by grouping adjacent pixels         
-			var k = 1;  
-			window['arrayN' + k] = [];
-			for (var row = 0; row<400; row++){            
-				for (var column = 0; column < 400; column++){
-					if (imageDataOriginal.data[(row*400 + column)*4+3] > 0){
-						
-						// Get the adjacent pixels if stroke is continuous and assign it to an array
-						var nextColumn = 1;
-						window['arrayN' + k].push(row*400 + column);
-						
-						/**
-						while ( imageFoo.data[(row*400 + column + nextColumn)*4+3] != 0){
-							window['arrayN' + k].push(row*400 + column + nextColumn);
-							nextColumn++;
-							//console.log("step 2 cleared")
-						} **/
-			               
-					   /**
-						// Check if this array is adjacent to another array in a previous row 
-						// k is the number or continuous arrays that have been identified
-						var arrayAdjusted = [];
-						var arrayToMerge = [];
-				 
-						for (var l = 1; l <= k; l++){
-							for (var element = 0; element < window['arrayN' + k].length; element++){
-								arrayAdjusted[element] = window['arrayN' + k][element] - 400;    
-								if (window['arrayN' + l].includes(arrayAdjusted[element])){
-									arrayToMerge.push(l);
-									arrayToMerge.push(k);    
-									break;
-								}
-							}              
-						}
-						
-						// Remove duplicated from array; decrease count k
-						if (arrayToMerge.length > 1) {                            
-							arrayToMerge = Array.from(new Set(arrayToMerge));
-							k--;
-						};
-  
-						
-						// Merge adjacent arrays into the same digit; and clear that array
-						for (var f = 1; f < arrayToMerge.length ; f++){
-							window['arrayN' + arrayToMerge[0]] = window['arrayN' + arrayToMerge[0]].concat(window['arrayN' + arrayToMerge[f]]);
-							window['arrayN' + arrayToMerge[f]] = [];
-						}
-
-						// Increase count k, initiate arrayNk, move to the correct column
-						k++;
-						window['arrayN' + k] = [];
-						column = column + nextColumn-1;
-					}
-				}
-			};
-			/**
-			console.log("Step 2 cleared ")
-			// Check which arrays are valid digits (length > 0); those that are length 0 are temporary arrays
-			var validaArrays = [];
-			for (var i = 1;  i < k; i++){
-				if (window['arrayN' + i].length > 0){
-					validaArrays.push(i);
-				}
-			}
-			
-			//// Process Neural Network for each digit
-			for (var i = 0; i < validaArrays.length; i++){
-				print(validaArrays);
-				//processIndividualImage(window['arrayN' + validaArrays[i]]);
-			}**/
-		}}}
-		};
+		
 		</script>
 <head>
 	<title>Honours Project</title>
@@ -311,7 +126,7 @@
 					<!-- Slide -->
 					<div class="owl-item">
 						<div class="background_image"
-							style="background-image:url({% static 'images/home_slider.jpg' %})"></div>
+							style="background-image:url({% static 'images/home_sliderr.jpg' %})"></div>
 
 						<div class="home_slider_content_container">
 							<div class="container">
@@ -635,7 +450,6 @@
 					<br>
 				<div class="text-center">
 						<h3>My predicted number: {{prediction_number}}</h3>
-						<h3>Prediction accuracy : {{pred_accuracy}}</h3>
 					</div>
 
 				
@@ -718,6 +532,7 @@
 							</footer>
 						</div>
 						<script>
+
 							// Canvas Drawing
 							window.addEventListener('load', ()=>{
 								const canvas = document.getElementById('canvas');
@@ -781,36 +596,6 @@
 									context.filter = 'invert(0)';
 									context.fillStyle = "black";
 									context.fillRect(0, 0, canvas.width, canvas.height);
-								});
-								// Canvas Submit
-								const predict_button = document.getElementById('predict_button');
-
-								predict_button.addEventListener('click', ()=>{
-									const canvas = document.getElementById('canvas');
-									dataUrl = canvas.toDataURL();
-									imageFoo = document.createElement('img');
-									imageFoo.src = dataUrl;
-									predict(imageFoo)
-									});
-									
-								
-					
-								// Pastel
-								const pastel = document.querySelector('#pastel');
-								pastel.addEventListener('click', ()=>{
-									const canvas = document.querySelector('#canvas');
-									const context = canvas.getContext('2d');
-									context.filter = 'invert(0)';
-									radius = 10;
-								});
-					
-								// Eraser
-								const eraser = document.querySelector('#eraser');
-								eraser.addEventListener('click', ()=>{
-									const canvas = document.querySelector('#canvas');
-									const context = canvas.getContext('2d');
-									context.filter = 'invert(1)';
-									radius = 30;
 								});
 
 							});

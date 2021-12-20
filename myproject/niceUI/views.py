@@ -69,7 +69,6 @@ def load_model(request):
 
 def digit_rec_model():
 
-    print("We've started...")
     #hand written characters 28x28 sized images of 0...9
     mnist=tf.keras.datasets.mnist
 
@@ -111,12 +110,9 @@ def digit_rec_model():
     model.add(Flatten()) #before using fully connected layer, need to be flatten so that 2D to 1D
 
 
-    # Fully connected layer #2   20x20=400 
-  
-
-    # Fully connected layer #3 (LAST)   20x20=400
+    # Fully connected layer #2 (LAST)   
     model.add(Dense(10))    # the last dense layer must be equal to 10
-    model.add(Activation("softmax")) #activation with Softmax (can also be sigmoid for BINARY classification)(class probabilities, not for binary)
+    model.add(Activation("softmax")) #activation with Softmax (can also be sigmoid for BINARY classification)(here we have non-binary class probabilities)
     # softmax is useful for probability distributions
 
     model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",metrics=['accuracy'])
@@ -132,83 +128,32 @@ def digit_rec_model():
     # Save model
     model.save('niceUI/digit_rec.h5')
 
-    # Creating a DNN (Deep Neural Network)
-    # Training with 60,000 samples
-    # create a neural net
-    '''model=Sequential()
-
-    # first convolution layer  (60000,28,28,1) 28-3+1=26x26
-    model.add(Conv2D(64,(3,3), input_shape=(28, 28, 1))) # 64 filters with size of 3x3
-    model.add(Activation("relu")) # activation function to make it non-linear, <0, remove, >0
-    model.add(MaxPooling2D(pool_size=(2,2))) #maxpooling single maximum value of 2x2
-
-    # 2nd convolution layer    26-3+1=24x24
-    model.add(Conv2D(64,(3,3)))
-    model.add(Activation("relu"))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-
-    # 3rd convolution layer
-    model.add(Conv2D(64,(3,3)))  #13x13
-    model.add(Activation("relu"))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-
-    # Fully connected layer #1   20x20=400
-    model.add(Flatten()) #before using fully connected layer, need to be flatten so that 2D to 1D
-    model.add(Dense(64))    #each 400 will be connected to each 64 neurons
-    model.add(Activation("relu"))
-
-    # Fully connected layer #2   20x20=400
-    model.add(Dense(32))    # decreasing the size gradually, we're trying to reach 10 bc we have labelled 10 digits 
-    model.add(Activation("relu"))
-
-    # Fully connected layer #3 (LAST)   20x20=400
-    model.add(Dense(10))    # the last dense layer must be equal to 10
-    model.add(Activation("softmax")) #activation with Softmax (can also be sigmoid for BINARY classification)(class probabilities, not for binary)
-    # softmax is useful for probability distributions
-
-    model.compile(loss="sparse_categorical_crossentropy", optimizer="adam",metrics=['accuracy'])
-
-    # Training the model
-    model.fit(x_trainr, y_train, epochs=5,validation_split=0.1)
-
-    # Predictions
-    # preditions are an array of class probabilities, so we need to decode them
-    predictions=model.predict([x_testr])
-    
-    # Save model
-    model.save('niceUI/digit_rec.h5')'''
-
-    # Evaluating the predictions
-    # Comparing test data vs predicted data
 
     return model
 
 def crop(img, x = 0, y = 0, w = 800, h = 800):
-
     # Setting the points for cropped image
-    #for first section
 
     im1 = img[y:h+y, x:w+x]
-    print()
-    #print("img shape:",im1.shape)
-    '''#cropping second half of image
-    x1=w//2
-    im2 = img[y:h, x1:w]'''
+
     return im1
 
 
 def predict_digit(request):
     # Load prebuilt model
     reconstructed_model = tf.keras.models.load_model('niceUI/digit_rec.h5')
+
+    #in case we wanted to recreate our model
     #reconstructed_model = digit_rec_model()
+    
+    #sets image size for the AI
     IMG_SIZE=28
     img = cv2.imread('/Users/Marco/Downloads/hand_written_digit.png')
-    #print("img shape:",img.shape)
-    #TODO img_left, img_right = crop(img)
+
     imgray_1 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #ret, thresh = cv2.threshold(imgray_1, 127, 255, 0)
+
     thresh = cv2.Canny(imgray_1, 100, 100 * 2)
-    #canny_output=cv2.blur(canny_output, (5,5))
+
     contours = []
     contours_tmp = cv2.findContours(imgray_1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours_tmp = contours_tmp[0] if len(contours_tmp) == 2 else contours_tmp[1]
@@ -226,32 +171,25 @@ def predict_digit(request):
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
         coord_lst.append(x)
-        #print(x, y, w, h)
         canvas_width = w + 50 if w + 50 > 300 else 300
         canvas_height = h + 50
         x_center = (canvas_width - w) // 2
         y_center = (canvas_height - h) // 2
         cropped = crop(imgray_1, x, y, w, h)
-        print(x, y)
-        print("--------- cropped dtype",cropped.shape)
+  
 
         result_image = np.full((canvas_height,canvas_width,1),0, dtype=np.uint8)
-        print("1----result_image shape:",result_image.shape)
+   
         # copy img image into center of result image
         cropped = np.expand_dims(cropped, axis=-1)
         result_image[y_center:y_center+h, x_center:x_center+w] = cropped
-        #result_image[0:0 + h, 0:0+w] = cropped
+    
 
-        cv2.imshow("dying inside", result_image)
+        cv2.imshow("cropped image", result_image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         lst.append(result_image)
-    #cv2.imshow("canny", canny_output)
-    print("length of con: "+str(len(contours)))
-    '''if cv2.countNonZero(img_right) == 0:
-        print ("Image is black")
-    else:
-        print ("Colored image")'''
+
     result=""
 
     res = dict(zip(coord_lst, lst))
@@ -259,7 +197,7 @@ def predict_digit(request):
     for c in lst:
         
         resized=cv2.resize(c, (IMG_SIZE,IMG_SIZE), interpolation=cv2.INTER_AREA)
-        cv2.imshow("dying inside", resized)
+        cv2.imshow("what the AI sees", resized)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         # 0 to 1 scaling
@@ -269,8 +207,8 @@ def predict_digit(request):
         predictions=reconstructed_model.predict(norm_img)
         result += str(np.argmax(predictions))
         print("predicted value: "+str(np.argmax(predictions)))
-    accuracy="~ 99%"
-    return render(request, "index.html", {'prediction_number':result, "pred_accuracy":accuracy, 'model':reconstructed_model.get_weights})
+    #received from when we trained our model
+    return render(request, "index.html", {'prediction_number':result, 'model':reconstructed_model.get_weights})
 
 
 
