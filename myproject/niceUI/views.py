@@ -94,19 +94,19 @@ def digit_rec_model():
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=(2,2))) #maxpooling single maximum value of 2x2
 
-    # 2nd convolution layer    26-3+1=24x24
+    # 2nd convolution layer    
     model.add(Conv2D(64,(3,3)))
     model.add(LeakyReLU())
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=(2,2)))
 
     # 3rd convolution layer
-    model.add(Conv2D(64,(3,3)))  #13x13
+    model.add(Conv2D(64,(3,3))) 
     model.add(LeakyReLU())
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=(2,2)))
 
-    # Fully connected layer #1   20x20=400
+    # Fully connected layer #1   
     model.add(Flatten()) #before using fully connected layer, need to be flatten so that 2D to 1D
 
 
