@@ -148,6 +148,9 @@ def predict_digit(request):
     
     #sets image size for the AI
     IMG_SIZE=28
+    ### REPLACE THE DIRECTROTY WITH YOUR OWN
+    # Every time you predict an image, the image gets downloaded this directory
+    # you need to make sure that the name of the image is the same as in here ("hand_written_digit.png")
     img = cv2.imread('/Users/Marco/Downloads/hand_written_digit.png')
 
     imgray_1 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
